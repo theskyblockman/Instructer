@@ -2,6 +2,9 @@ package fr.theskyblockman.instructer;
 
 import com.google.common.hash.Hashing;
 import com.google.gson.Gson;
+import fr.theskyblockman.instructer.handshake.ConnectingSocket;
+import fr.theskyblockman.instructer.response.*;
+import fr.theskyblockman.instructer.servers.ServerConnectedTo;
 
 import java.io.IOException;
 import java.lang.invoke.WrongMethodTypeException;
@@ -12,6 +15,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.rmi.ConnectIOException;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * A class to represent the current server
@@ -20,7 +24,7 @@ public class Server {
     /**
      * The position of the current server
      */
-    public final ServerType position;
+    public final String position;
     /**
      * The token of the current server to log in to it
      */
@@ -33,7 +37,7 @@ public class Server {
     /**
      * All the active connexions to the server
      */
-    private final Map<ServerType, List<ConnectedServer>> connexions = new HashMap<>();
+    private final Map<String, List<ConnectedServer>> connexions = new HashMap<>();
     /**
      * Is the server online or not
      */
@@ -60,6 +64,8 @@ public class Server {
      */
     public List<ConnectingSocket> beingConnectedSockets = new ArrayList<>();
 
+    public Logger logger = Logger.getLogger(Server.class.getName());
+
     /**
      * Verifies if a listener method is callable for a request
      * @param method The method that is being tested
@@ -67,7 +73,7 @@ public class Server {
      * @param otherPosition The position of the sender of the request
      * @return If the method should be called or not
      */
-    private boolean isCallable(Method method, Request request, ServerType otherPosition) {
+    private boolean isCallable(Method method, Request request, String otherPosition) {
         ResponseHandler handler = method.getAnnotation(ResponseHandler.class);
         RespondsTo responders = method.getAnnotation(RespondsTo.class);
         RespondTo responder = method.getAnnotation(RespondTo.class);
@@ -80,7 +86,7 @@ public class Server {
             throw new WrongMethodTypeException("A method is incorrect in one of your Listeners, there should be only 1 parameter, a ResponseBuilder that returns a response of the same type of the request and one or more RespondTo annotation");
         }
         if(!handler.listenedPacket().equals(request.packetType)) return false;
-        List<ServerType> respondersOfMethod = new ArrayList<>();
+        List<String> respondersOfMethod = new ArrayList<>();
 
         if(responders != null) {
             for (RespondTo respondTo : responders.value()) {
@@ -89,8 +95,8 @@ public class Server {
         } else {
             respondersOfMethod.add(responder.interactor());
         }
-        for (ServerType possibleResponse : respondersOfMethod) {
-            if(possibleResponse == otherPosition) return true;
+        for (String possibleResponse : respondersOfMethod) {
+            if(possibleResponse.equals(otherPosition)) return true;
         }
         return false;
     }
@@ -111,7 +117,7 @@ public class Server {
                                 waitingSocket.checkStream();
                                 if(waitingSocket.triedConnexion) {
                                     if(waitingSocket.connexionSuccessful) {
-                                        System.out.println("Server connexion accepted, type: " + waitingSocket.otherServerType + ", timestamp: " + waitingSocket.connexionTimestamp);
+                                        logger.info("Server connexion accepted, type: " + waitingSocket.otherServerType + ", timestamp: " + waitingSocket.connexionTimestamp);
                                         beingConnectedSockets.remove(waitingSocket);
                                         connexions.putIfAbsent(waitingSocket.otherServerType, new ArrayList<>());
                                         connexions.get(waitingSocket.otherServerType).add(waitingSocket.toConnected());
@@ -119,7 +125,7 @@ public class Server {
                                             listener.onLogin();
                                         }
                                     } else {
-                                        System.out.println("Server connexion refused, timestamp: " + waitingSocket.connexionTimestamp);
+                                        logger.info("Server connexion refused, timestamp: " + waitingSocket.connexionTimestamp);
                                         waitingSocket.socket.close();
                                         beingConnectedSockets.remove(waitingSocket);
                                     }
@@ -135,8 +141,8 @@ public class Server {
                             throw new RuntimeException(e);
                         }
                     }
-                    Map<ServerType, List<ConnectedServer>> copyConnexion = new HashMap<>(connexions);
-                    for (Map.Entry<ServerType, List<ConnectedServer>> connexionType : copyConnexion.entrySet()) {
+                    Map<String, List<ConnectedServer>> copyConnexion = new HashMap<>(connexions);
+                    for (Map.Entry<String, List<ConnectedServer>> connexionType : copyConnexion.entrySet()) {
                         for (ConnectedServer connexion : connexionType.getValue()) {
                             try {
                                 String lastReadLine = connexion.in.readLine();
@@ -157,7 +163,7 @@ public class Server {
                                             if(sentRequest) break;
                                         }
                                         if(!sentRequest) {
-                                            System.out.println("WARNING! A method not handled by any listener have been received, it's type is: " + req.packetType.name);
+                                            logger.warning("A method not handled by any listener have been received, it's type is: " + req.packetType);
                                         }
                                     } else {
                                         Response resp = gson.fromJson(lastReadLine, Response.class);
@@ -196,12 +202,12 @@ public class Server {
 
     /**
      * Create a server as a database, a linker, a host or a resource server
-     * @param position The position of the server (can not be {@link ServerType}.MANAGER)
+     * @param position The position of the server (can not be a manager)
      * @param token The token used to connect to the manager server
      * @param port The port that the server will use
      * @throws IOException If we cannot contact the internet
      */
-    public Server(ServerType position, String token, int port) throws IOException {
+    public Server(String position, String token, int port) throws IOException {
         this.position = position;
         this.token = token;
         this.socket = new ServerSocket(port);
@@ -209,14 +215,14 @@ public class Server {
     }
     /**
      * Create a server as a database, a linker, a host or a resource server
-     * @param position The position of the server (can not be {@link ServerType}.MANAGER)
+     * @param position The position of the server (can not be a manager)
      * @param token The token used to connect to the manager server
      * @param port The port that the server will use
      * @param validTokens The correct tokens used by other servers to connect to the current server
      * @throws IOException If we cannot contact the internet
      */
     @SuppressWarnings("unused")
-    public Server(ServerType position, String token, String[] validTokens, int port) throws IOException {
+    public Server(String position, String token, String[] validTokens, int port) throws IOException {
         this.position = position;
         this.token = token;
         this.socket = new ServerSocket(port);
@@ -251,9 +257,9 @@ public class Server {
      */
     public Server(String[] validTokens, int port) throws IOException {
         if(validTokens.length == 0) {
-            System.out.println("WARNING! there isn't any valid tokens registered in the manager server, the authentication is deactivated");
+            logger.warning("There isn't any valid tokens registered in the manager server, the authentication is deactivated");
         }
-        this.position = ServerType.MANAGER;
+        this.position = "manager";
         this.validTokens = validTokens;
         this.token = "self";
         this.socket = new ServerSocket(port);
@@ -276,10 +282,9 @@ public class Server {
      * @param request The request to broadcast
      * @param serverType The type of server that will receive the request
      */
-    public void broadcastRequest(Request request, ServerType serverType) {
+    public void broadcastRequest(Request request, String serverType) {
         if(!connexions.containsKey(serverType)) return;
         broadcastRequest(request, connexions.get(serverType).toArray(new ConnectedServer[0]));
-
     }
 
     /**
@@ -317,7 +322,7 @@ public class Server {
      * Stops the server on demand
      */
     public void stop() {
-        System.out.println("Stopped server");
+        logger.info("Stopped " + position + " server.");
         for (List<ConnectedServer> connexionList : connexions.values()) {
             for (ConnectedServer connexion : connexionList) {
                 connexion.closeConnexion();

@@ -1,5 +1,6 @@
-package fr.theskyblockman.instructer;
+package fr.theskyblockman.instructer.servers;
 
+import fr.theskyblockman.instructer.Server;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
@@ -29,7 +30,7 @@ public class ServerConnectedTo {
     /**
      * The position of the other server
      */
-    public ServerType otherPosition;
+    public String otherPosition;
     /**
      * The current server
      */
@@ -46,7 +47,7 @@ public class ServerConnectedTo {
     /**
      * The position of the current server
      */
-    public final ServerType currentPosition;
+    public final String currentPosition;
 
     /**
      * The constructor of the server connexion
@@ -57,7 +58,7 @@ public class ServerConnectedTo {
      * @param currentServer The current server
      * @throws ConnectIOException if we cannot establish connexion
      */
-    public ServerConnectedTo(String serverIP, int serverPort, @Nullable String token, ServerType currentPosition, Server currentServer) throws ConnectIOException {
+    public ServerConnectedTo(String serverIP, int serverPort, @Nullable String token, String currentPosition, Server currentServer) throws ConnectIOException {
         try {
             this.currentServer = currentServer;
             this.socket = new Socket(serverIP, serverPort);

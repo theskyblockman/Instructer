@@ -1,35 +1,34 @@
 package fr.theskyblockman.instructer;
 
 /**
- * A class to represent all the types of servers
+ * A class to represent some types of servers (all of those are examples excepted for the manager)
  */
 @SuppressWarnings("unused")
 public enum ServerType {
     /**
-     * Where all player data is stored
+     * Where all user data is stored
      */
     DATABASE("database"), // Where all player data is stored
     /**
-     * The link between the servers, a way to link players
+     * The link between the servers, a way to link users
      */
-    LINKER("linker"), // The link between the servers, a way to link players
+    LINKER("linker"),
     /**
-     * A server where the players get redirected to
+     * A server where the users get redirected to
      */
     HOST("host"),
     /**
-     * A CDN where all resources for servers are stored (maps, libs, resource packs...)
+     * A CDN where all resources for servers can be stored
      */
     RESOURCE("resource"),
     /**
-     * The "boss" who manages everything
+     * The server manager
      */
     MANAGER("manager"),
     /**
-     * The admin GUI to manage every server manually
+     * A server for network managers
      */
     ADMIN("admin")
-    // API("api") API server???
     ;
     /**
      * The name of the server

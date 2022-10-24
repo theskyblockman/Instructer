@@ -1,4 +1,4 @@
-package fr.theskyblockman.instructer;
+package fr.theskyblockman.instructer.response;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -15,6 +15,6 @@ public @interface ResponseHandler {
      * The type of packet the method is able to respond to
      * @return The type of the packet the method listens to
      */
-    PacketType listenedPacket();
+    String listenedPacket();
 
 }

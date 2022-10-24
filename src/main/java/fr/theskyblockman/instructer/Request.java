@@ -1,6 +1,7 @@
 package fr.theskyblockman.instructer;
 
 import com.google.gson.Gson;
+import fr.theskyblockman.instructer.response.Responder;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -14,7 +15,7 @@ public class Request implements Serializable, Cloneable {
     /**
      * The type of packet the current request is
      */
-    public final PacketType packetType;
+    public final String packetType;
     /**
      * The arguments of the request
      */
@@ -35,6 +36,9 @@ public class Request implements Serializable, Cloneable {
      * @param responder The method to call when a response is received
      */
     public Request(PacketType packetType, @NotNull Map<String, Object> arguments, Responder responder) {
+        this(packetType.name, arguments, responder);
+    }
+    public Request(String packetType, @NotNull Map<String, Object> arguments, Responder responder) {
         this.packetType = packetType;
         arguments.put("type", "request");
         this.arguments = arguments;

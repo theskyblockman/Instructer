@@ -1,4 +1,4 @@
-package fr.theskyblockman.instructer;
+package fr.theskyblockman.instructer.response;
 
 /**
  * An interface to represent a listener

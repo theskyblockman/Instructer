@@ -1,6 +1,8 @@
-package fr.theskyblockman.instructer;
+package fr.theskyblockman.instructer.response;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Repeatable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * An annotation to mark a method to what server types the method wants to respond to
@@ -12,5 +14,5 @@ public @interface RespondTo {
      * The server type the method requests
      * @return the server type the method requests
      */
-    ServerType interactor();
+    String interactor();
 }

@@ -1,5 +1,9 @@
 package fr.theskyblockman.instructer;
 
+import fr.theskyblockman.instructer.response.Response;
+import fr.theskyblockman.instructer.servers.ServerConnectedFrom;
+import fr.theskyblockman.instructer.servers.ServerConnectedTo;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -33,7 +37,7 @@ public class ConnectedServer {
     /**
      * The server type of the other server
      */
-    public ServerType otherPosition;
+    public String otherPosition;
     /**
      * The current server the packets are being sent by
      */
@@ -45,7 +49,7 @@ public class ConnectedServer {
     /**
      * The current position of the server
      */
-    public ServerType currentPosition;
+    public String currentPosition;
     /**
      * The token used to connect to the server if the server connected himself to the other server
      */
@@ -102,13 +106,10 @@ public class ConnectedServer {
      * Close the connexion between the current server and the other server represented by this class
      */
     public void closeConnexion() {
-        send(new Request(PacketType.LOGOUT, new HashMap<>(), new Responder() {
-            @Override
-            public void onResponse(Response response) {
-                try {
-                    socket.close();
-                } catch (IOException ignore) {}
-            }
+        send(new Request(PacketType.LOGOUT, new HashMap<>(), response -> {
+            try {
+                socket.close();
+            } catch (IOException ignore) {}
         }));
     }
 
@@ -122,12 +123,9 @@ public class ConnectedServer {
             args.put("token", token);
         }
         args.put("position", currentPosition);
-        send(new Request(PacketType.LOGIN, args, new Responder() {
-            @Override
-            public void onResponse(Response response) {
-                otherPosition = ServerType.valueOf((String) response.responseArgs.get("position"));
-                logged = true;
-            }
+        send(new Request(PacketType.LOGIN, args, response -> {
+            otherPosition = (String) response.responseArgs.get("position");
+            logged = true;
         }));
         await().until(() -> logged);
     }

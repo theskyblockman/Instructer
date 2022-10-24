@@ -1,4 +1,9 @@
-package fr.theskyblockman.instructer;
+package fr.theskyblockman.instructer.servers;
+
+import fr.theskyblockman.instructer.Request;
+import fr.theskyblockman.instructer.Server;
+import fr.theskyblockman.instructer.response.Response;
+import fr.theskyblockman.instructer.response.ResponseBuilder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,7 +34,7 @@ public class ServerConnectedFrom {
     /**
      * The position of the other server
      */
-    public ServerType otherPosition;
+    public String otherPosition;
     /**
      * The current server
      */
@@ -43,12 +48,12 @@ public class ServerConnectedFrom {
      * @param currentServer The current server
      * @throws IOException If we couldn't connect to the other server
      */
-    public ServerConnectedFrom(Request loginRequest, Socket socket, ServerType serverCurrentType, Server currentServer) throws IOException {
+    public ServerConnectedFrom(Request loginRequest, Socket socket, String serverCurrentType, Server currentServer) throws IOException {
         this.otherSocket = socket;
         this.usedHashToConnect = (String) loginRequest.arguments.get("token");
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.out = new PrintWriter(socket.getOutputStream(), true);
-        this.otherPosition = ServerType.valueOf((String) loginRequest.arguments.get("position"));
+        this.otherPosition = (String) loginRequest.arguments.get("position");
         this.currentServer = currentServer;
         send(new ResponseBuilder(loginRequest, this.otherPosition).setArgument("position", serverCurrentType).build());
     }

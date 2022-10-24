@@ -1,4 +1,6 @@
-package fr.theskyblockman.instructer;
+package fr.theskyblockman.instructer.response;
+
+import fr.theskyblockman.instructer.Request;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +20,7 @@ public class ResponseBuilder {
     /**
      * The type of the server of the server this response will be sent to
      */
-    private final ServerType otherServerType;
+    private final String otherServerType;
 
     /**
      * The getter of the initial request
@@ -34,7 +36,7 @@ public class ResponseBuilder {
      * @return the other server type
      */
     @SuppressWarnings("unused")
-    public ServerType getOtherServerType() {
+    public String getOtherServerType() {
         return otherServerType;
     }
 
@@ -43,7 +45,7 @@ public class ResponseBuilder {
      * @param initialRequest The initial request used as a draft to build the response
      * @param otherServerType The type of the other server the response will be sent to
      */
-    public ResponseBuilder(Request initialRequest, ServerType otherServerType) {
+    public ResponseBuilder(Request initialRequest, String otherServerType) {
         this.initialRequest = initialRequest;
         this.otherServerType = otherServerType;
     }

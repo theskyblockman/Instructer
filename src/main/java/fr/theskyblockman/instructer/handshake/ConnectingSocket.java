@@ -1,4 +1,9 @@
-package fr.theskyblockman.instructer;
+package fr.theskyblockman.instructer.handshake;
+
+import fr.theskyblockman.instructer.ConnectedServer;
+import fr.theskyblockman.instructer.Request;
+import fr.theskyblockman.instructer.Server;
+import fr.theskyblockman.instructer.servers.ServerConnectedFrom;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,6 +12,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a server being connected
@@ -43,7 +49,7 @@ public class ConnectingSocket {
     /**
      * The type of the other server
      */
-    public ServerType otherServerType;
+    public String otherServerType;
     /**
      * The Request received when logged in
      */
@@ -51,7 +57,7 @@ public class ConnectingSocket {
     /**
      * The type of the current server
      */
-    private final ServerType currentServerType;
+    private final String currentServerType;
     /**
      * The current server
      */
@@ -65,7 +71,7 @@ public class ConnectingSocket {
      * @param currentServer the current server
      * @throws IOException if we failed to communicate with the other server
      */
-    public ConnectingSocket(Socket socket, List<String> awaitedHashes, ServerType currentServerType, Server currentServer) throws IOException {
+    public ConnectingSocket(Socket socket, List<String> awaitedHashes, String currentServerType, Server currentServer) throws IOException {
         this.socket = socket;
         this.connexionTimestamp = new Date().getTime();
         this.awaitedHashes = awaitedHashes;
@@ -86,8 +92,8 @@ public class ConnectingSocket {
 
             Request req = Server.gson.fromJson(currentLine, Request.class);
             loginRequest = req;
-            otherServerType = ServerType.valueOf((String) req.arguments.get("position"));
-            if(req.packetType != PacketType.LOGIN) {
+            otherServerType = (String) req.arguments.get("position");
+            if(!Objects.equals(req.packetType, "login")) {
                 return;
             }
             triedConnexion = true;

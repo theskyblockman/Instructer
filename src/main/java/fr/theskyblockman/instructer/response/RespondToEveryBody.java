@@ -1,4 +1,4 @@
-package fr.theskyblockman.instructer;
+package fr.theskyblockman.instructer.response;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
