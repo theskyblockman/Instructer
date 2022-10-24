@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.lang.invoke.WrongMethodTypeException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -117,7 +118,7 @@ public class Server {
                                 waitingSocket.checkStream();
                                 if(waitingSocket.triedConnexion) {
                                     if(waitingSocket.connexionSuccessful) {
-                                        logger.info("Server connexion accepted, type: " + waitingSocket.otherServerType + ", timestamp: " + waitingSocket.connexionTimestamp);
+                                        logger.info("Server connexion accepted, type: " + waitingSocket.otherServerType + ", timestamp: " + waitingSocket.connexionTimestamp + ", remote ip: " + (((InetSocketAddress) waitingSocket.socket.getRemoteSocketAddress()).getAddress()).toString().replace("/",""));
                                         beingConnectedSockets.remove(waitingSocket);
                                         connexions.putIfAbsent(waitingSocket.otherServerType, new ArrayList<>());
                                         connexions.get(waitingSocket.otherServerType).add(waitingSocket.toConnected());
@@ -252,7 +253,7 @@ public class Server {
     /**
      * Create a server as a manager
      * @param validTokens the list of token hashes (under MD5 specifications) that can be used by the server
-     * @param port The part the server will use
+     * @param port The port the server will use
      * @throws IOException if we can't communicate with the internet
      */
     public Server(String[] validTokens, int port) throws IOException {
