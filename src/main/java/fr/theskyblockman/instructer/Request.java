@@ -29,6 +29,8 @@ public class Request implements Serializable, Cloneable {
      */
     transient Responder responder;
 
+    public static Gson gson = new Gson();
+
     /**
      * Constructor of a new request
      * @param packetType The type of the request
@@ -51,7 +53,6 @@ public class Request implements Serializable, Cloneable {
      * @return the serialized request
      */
     public String toJSON() {
-        Gson gson = new Gson();
         return gson.toJson(this);
     }
 
