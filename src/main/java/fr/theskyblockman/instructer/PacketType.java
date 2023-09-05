@@ -22,15 +22,15 @@ public enum PacketType {
      */
     REGISTER("register"),
     /**
-     * The query packet, query a MySQL line to the database server
+     * The query packet, query a SQL line to the database server
      */
     QUERY("query"),
     /**
-     * The server requester packet, sent to manager, gives one time usable tokens with server ips and ports to log in to all servers
+     * The server requester packet, sent to manager, gives one time usable tokens with server IPs and ports to log in to all servers
      */
     GET_ASSIGNED_SERVERS("get_servers"),
     /**
-     * The server health packet, asks for any server all it's statistics (player amount, CPU, RAM, run time, version, server UUIDs...) this can be also used to do a full server map to know how to quickly link servers
+     * The server health packet, asks for any server all it's statistics (CPU, RAM, run time, version, server UUIDs...)
      */
     GET_SERVER_HEALTH("get_server_health"),
     /**
